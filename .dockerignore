@@ -1,0 +1,40 @@
+# Exclude unnecessary files from Docker build context
+
+# VCS and IDE
+.git/
+.gitignore
+.idea/
+*.iml
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Build outputs
+/target/
+/build/
+/out/
+/dist/
+/dist-newstyle/
+/.stack-work/
+
+# Java/Maven/Gradle
+.mvn/
+.gradle/
+.settings/
+.classpath
+.project
+
+# Logs and temp
+*.log
+*.tmp
+/tmp/
+
+# Coverage and test caches
+/coverage/
+/.pytest_cache/
+
+# Avoid copying CI configs if not needed in image
+.github/
+qodana.yaml
