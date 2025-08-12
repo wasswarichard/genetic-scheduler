@@ -127,16 +127,19 @@ Environment variables (read by `SchedulerService`):
 
 ## Data Model
 
-TaskInput
+TaskInput (class scheduling)
 - `taskId: Int`
 - `duration: Int (>0)`
 - `priority: Int`
-- `requiredResource: String`
+- `requiredResource: String` (room id)
+- `courseName: String`
+- `studentCount: Int`
 - `dependsOn: [Int]`
 
-ResourceInput
+ResourceInput (room)
 - `resourceId: String`
-- `capacityPerSlot: Int (>0)`
+- `capacityPerSlot: Int (>0)` (parallel usage, e.g., lab machines)
+- `seatCapacity: Int` (number of students the room can hold)
 
 Haskell output
 - `bestSchedule: [{ taskId, timeSlot, resourceId }]`

@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * TaskInput represents a single unit of work to be scheduled.
+ * Now tailored for class scheduling: includes courseName and studentCount.
  * Fields mirror the JSON contract shared with the Haskell component.
  */
 public class TaskInput {
@@ -13,10 +14,14 @@ public class TaskInput {
     private int duration;
     /** Priority (e.g., 1–10), higher means more important. */
     private int priority;
-    /** Resource ID required to execute this task. */
+    /** Resource ID required to execute this task (e.g., room id). */
     private String requiredResource;
     /** List of task IDs that must complete before this task can start. */
     private List<Integer> dependsOn;
+    /** Course name for the class to be scheduled. */
+    private String courseName;
+    /** Number of students attending the class. */
+    private int studentCount;
 
     public TaskInput() {}
 
@@ -42,4 +47,10 @@ public class TaskInput {
 
     public List<Integer> getDependsOn() { return dependsOn; }
     public void setDependsOn(List<Integer> dependsOn) { this.dependsOn = dependsOn; }
+
+    public String getCourseName() { return courseName; }
+    public void setCourseName(String courseName) { this.courseName = courseName; }
+
+    public int getStudentCount() { return studentCount; }
+    public void setStudentCount(int studentCount) { this.studentCount = studentCount; }
 }

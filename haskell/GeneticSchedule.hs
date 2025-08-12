@@ -27,6 +27,8 @@ data Task = Task
   , priority :: Int             -- ^ Priority, higher is more important
   , requiredResource :: String  -- ^ Resource that must execute this task
   , dependsOn :: [Int]          -- ^ Task IDs that must finish before this starts
+  , courseName :: String        -- ^ Course name for class scheduling
+  , studentCount :: Int         -- ^ Number of students attending
   } deriving (Show, Generic)
 
 instance FromJSON Task
@@ -36,6 +38,7 @@ instance ToJSON Task
 data Resource = Resource
   { resourceId :: String
   , capacityPerSlot :: Int
+  , seatCapacity :: Int
   } deriving (Show, Generic)
 
 instance FromJSON Resource

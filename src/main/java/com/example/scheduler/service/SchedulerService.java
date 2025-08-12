@@ -122,6 +122,8 @@ public class SchedulerService {
               .append("\"duration\":").append(t.getDuration()).append(',')
               .append("\"priority\":").append(t.getPriority()).append(',')
               .append("\"requiredResource\":\"").append(escape(t.getRequiredResource())).append("\",")
+              .append("\"courseName\":\"").append(escape(t.getCourseName())).append("\",")
+              .append("\"studentCount\":").append(t.getStudentCount()).append(',')
               .append("\"dependsOn\":[");
             List<Integer> deps = t.getDependsOn();
             for (int j = 0; j < (deps == null ? 0 : deps.size()); j++) {
@@ -139,7 +141,8 @@ public class SchedulerService {
             if (i > 0) sb.append(',');
             sb.append('{')
               .append("\"resourceId\":\"").append(escape(r.getResourceId())).append("\",")
-              .append("\"capacityPerSlot\":").append(r.getCapacityPerSlot())
+              .append("\"capacityPerSlot\":").append(r.getCapacityPerSlot()).append(',')
+              .append("\"seatCapacity\":").append(r.getSeatCapacity())
               .append('}');
         }
         sb.append(']');
@@ -258,6 +261,11 @@ public class SchedulerService {
                 String q = String.format("assert_resource('%s', %d)", escape(r.getResourceId()), r.getCapacityPerSlot());
                 Object qr = jplQuery.getConstructor(String.class).newInstance(q);
                 jplQuery.getMethod("hasSolution").invoke(qr);
+                if (r.getSeatCapacity() > 0) {
+                    String qSeats = String.format("assert_room_capacity('%s', %d)", escape(r.getResourceId()), r.getSeatCapacity());
+                    Object qrs = jplQuery.getConstructor(String.class).newInstance(qSeats);
+                    jplQuery.getMethod("hasSolution").invoke(qrs);
+                }
             }
 
             // assert tasks and dependencies
@@ -272,6 +280,13 @@ public class SchedulerService {
                 String q = String.format("assert_task(%d, %d, %d, '%s')", tid, slot, dur, escape(rid));
                 Object qt = jplQuery.getConstructor(String.class).newInstance(q);
                 jplQuery.getMethod("hasSolution").invoke(qt);
+                // optional student count fact for seat validation
+                int students = taskById.get(tid).getStudentCount();
+                if (students > 0) {
+                    String qs = String.format("assert_task_students(%d, %d)", tid, students);
+                    Object qst = jplQuery.getConstructor(String.class).newInstance(qs);
+                    jplQuery.getMethod("hasSolution").invoke(qst);
+                }
             }
 
             for (TaskInput t : req.tasks) {

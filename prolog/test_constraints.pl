@@ -9,6 +9,7 @@ run_tests :-
     ( test_valid_schedule -> format(' [OK] valid schedule passes~n', []) ; (format(' [FAIL] valid schedule should pass~n', []), halt(1)) ),
     ( test_overbooking_fails -> format(' [OK] overbooking schedule fails~n', []) ; (format(' [FAIL] overbooking should fail~n', []), halt(1)) ),
     ( test_dependency_violation_fails -> format(' [OK] dependency violation fails~n', []) ; (format(' [FAIL] dependency violation should fail~n', []), halt(1)) ),
+    ( test_seat_capacity_violation_fails -> format(' [OK] seat capacity violation fails~n', []) ; (format(' [FAIL] seat capacity violation should fail~n', []), halt(1)) ),
     format('All Prolog tests passed.~n', []),
     halt(0).
 
@@ -20,7 +21,13 @@ setup_valid_state :-
     assert_task(1, 0, 2, 'R1'),
     assert_task(2, 2, 1, 'R1'),
     assert_task(3, 0, 3, 'R2'),
-    assert_dependency(2, 1).
+    assert_dependency(2, 1),
+    % room and students
+    assert_room_capacity('R1', 50),
+    assert_room_capacity('R2', 30),
+    assert_task_students(1, 40),
+    assert_task_students(2, 10),
+    assert_task_students(3, 25).
 
 setup_overbook_state :-
     clear_facts,
@@ -37,6 +44,14 @@ setup_dependency_violation_state :-
     assert_task(2, 1, 1, 'R1'),
     assert_dependency(2, 1).
 
+setup_seat_capacity_violation_state :-
+    clear_facts,
+    assert_resource('R1', 1),
+    assert_task(1, 0, 1, 'R1'),
+    % Students exceed room capacity
+    assert_room_capacity('R1', 20),
+    assert_task_students(1, 25).
+
 
 % Tests
 
@@ -52,4 +67,9 @@ test_overbooking_fails :-
 % Should fail due to dependency violation
 test_dependency_violation_fails :-
     setup_dependency_violation_state,
+    ( valid_schedule -> fail ; true ).
+
+% Should fail when students exceed room seat capacity
+test_seat_capacity_violation_fails :-
+    setup_seat_capacity_violation_state,
     ( valid_schedule -> fail ; true ).
