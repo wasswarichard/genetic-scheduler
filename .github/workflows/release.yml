@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install SWI-Prolog, GHC and cabal
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog ghc cabal-install
+
+      - name: Install Haskell aeson library (for build)
+        run: |
+          cabal update
+          cabal install aeson --lib
+
+      - name: Build Haskell scheduler binary
+        run: |
+          ghc -O2 -threaded haskell/GeneticSchedule.hs -o genetic-schedule
+
+      - name: Package artifact
+        run: |
+          mkdir -p dist
+          cp genetic-schedule dist/
+          cp -r prolog dist/prolog
+          cp sample-request.json dist/
+          echo "Build timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" > dist/BUILD_INFO.txt
+          tar -czf genetic-scheduler-${{ github.ref_name }}.tar.gz -C dist .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            genetic-scheduler-${{ github.ref_name }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

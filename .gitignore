@@ -13,6 +13,7 @@ Icon?
 .vscode/
 *.swp
 *.swo
+.idea
 
 # ---- Java / JVM builds ----
 # If you add Maven/Gradle later, these will appear

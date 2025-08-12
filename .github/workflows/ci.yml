@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install SWI-Prolog, GHC and cabal
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog ghc cabal-install
+
+      - name: Install Haskell aeson library (for runhaskell)
+        run: |
+          cabal update
+          cabal install aeson --lib
+
+      - name: Show tool versions
+        run: |
+          java -version || true
+          ghc --version || true
+          cabal --version || true
+          swipl --version || true
+
+      - name: Run Prolog and Haskell tests
+        run: |
+          bash tests/run_all.sh
+
+      - name: Compile and run Java unit tests
+        run: |
+          javac -cp src/main/java src/test/java/com/example/scheduler/service/SchedulerServiceUnitTest.java
+          java -cp src/main/java:src/test/java com.example.scheduler.service.SchedulerServiceUnitTest
