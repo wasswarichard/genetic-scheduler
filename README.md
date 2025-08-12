@@ -7,6 +7,34 @@ A modular, extensible scheduling engine with:
 
 This repo is designed to be easy to run locally while keeping the architecture production-friendly.
 
+## Why Java, Haskell, and Prolog?
+
+- Java (Spring Boot) for orchestration and APIs:
+  - Strengths: battle‑tested web stack, ecosystem for REST, security, observability, dependency injection, and enterprise deployment.
+  - Role here: exposes REST endpoints, validates input, coordinates external tools (Haskell, Prolog), and returns JSON to clients. Easy integration into existing JVM shops.
+
+- Haskell for search/optimization (Genetic Algorithm ready):
+  - Strengths: purity and strong types reduce bugs in complex state transitions; lazy but optimizable; good performance when compiled; concise expression of algorithmic transforms.
+  - Role here: evolves/constructs candidate schedules from task/resource metadata. The current implementation is a deterministic greedy baseline but the interface and code layout are GA‑ready.
+
+- Prolog (SWI‑Prolog) for hard constraints:
+  - Strengths: declarative constraint expression; backtracking/logic programming fits validation of resource capacities, overlaps, and dependencies.
+  - Role here: an authoritative validator such that any schedule produced by Haskell (or future engines) must satisfy the rules. This separation keeps constraints auditable and easy to extend.
+
+Why a polyglot approach?
+- Clear separation of concerns: orchestration (Java), search/generation (Haskell), constraints/validation (Prolog).
+- Independent evolution: swap GA strategies without touching the API, or update constraints without risking algorithmic regressions.
+- Reliability: a dedicated validator catches mistakes from the generator, improving trust in results.
+- Interop: each component communicates via simple JSON/facts, enabling future replacement by other technologies (e.g., Rust/OR‑Tools/Python).
+
+Trade‑offs and alternatives
+- Complexity: more languages mean more tooling. Mitigations include Docker and CI steps already provided.
+- Performance vs simplicity: For small problems, a single‑language solution (e.g., Java + OR‑Tools CP‑SAT or Kotlin) might be simpler. For rich, evolving constraints, Prolog’s clarity pays off.
+- Alternatives:
+  - All‑in‑Java with a solver (OptaPlanner, OR‑Tools Java) when JVM‑only is preferred.
+  - Haskell‑only using a constraint/logic library and exposing an HTTP server.
+  - Python (FastAPI) + OR‑Tools for rapid prototyping; later migrate hot paths to Rust/C++.
+
 ## Architecture Overview
 
 - Java
