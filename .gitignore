@@ -1,0 +1,53 @@
+# Root-level .ignore
+# Purpose: help tools/editors ignore transient artifacts across this polyglot project
+# Note: This does not affect Git unless your tooling reads .ignore. For Git, prefer .gitignore.
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+Icon?
+
+# ---- IDE / Editor ----
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# ---- Java / JVM builds ----
+# If you add Maven/Gradle later, these will appear
+/target/
+/build/
+/out/
+.classpath
+.project
+.settings/
+.gradle/
+.mvn/wrapper/
+
+# ---- Logs & temp ----
+*.log
+*.tmp
+/tmp/
+
+# ---- Haskell ----
+# cabal & stack artifacts
+/dist/
+/dist-newstyle/
+/.stack-work/
+
+# GHC intermediates
+*.hi
+*.o
+*.dyn_o
+*.dyn_hi
+
+# ---- Prolog ----
+# Typically none; add here if your toolchain creates artifacts
+
+# ---- Test artifacts ----
+/coverage/
+/.pytest_cache/
+
+# ---- Shell ----
+*.sh.swp
